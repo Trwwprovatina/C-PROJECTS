@@ -1,0 +1,150 @@
+using System;
+
+namespace Algorithm
+{
+    class Sudoku_Solution
+    {
+        static void Main(string[] args)
+        {
+            // Step 1: Creation of N x N grid.
+            Console.WriteLine("Let's solve Sudoku!\nType how many cells it will have. The quantity of them must be a perfect square (like 4, 9, 16, etc.):");
+            bool isValid = false;
+            int cells = 0;
+            int gridSize = 0;
+
+            while (!isValid)
+            {
+                string input = Console.ReadLine();
+                if (int.TryParse(input, out cells))
+                {
+                    if (cells <= 0)
+                    {
+                        Console.WriteLine("You must give a valid number, not negative or zero.");
+                    }
+                    else if ((int)Math.Sqrt(cells) * (int)Math.Sqrt(cells) != cells)
+                    {
+                        Console.WriteLine("The number of cells must be a perfect square.");
+                    }
+                    else
+                    {
+                        gridSize = (int)Math.Sqrt(cells);
+                        isValid = true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("You must enter a valid number:");
+                }
+            }
+
+            int[,] grid = new int[gridSize, gridSize];
+
+            // Step 2: Choose difficulty level.
+            Console.WriteLine("Select difficulty level:\nPress 1 for Easy.\nPress 2 for Medium.\nPress 3 for Hard.");
+            bool validChoice = false;
+            int prefilledCount = 0;
+            while (!validChoice)
+            {
+                string difficulty = Console.ReadLine();
+                if (difficulty == "1" || difficulty == "2" || difficulty == "3")
+                {
+                    Random rnd = new Random();
+                    double percentage = difficulty == "1" ? 0.4 + rnd.NextDouble() * 0.1 :
+                                       difficulty == "2" ? 0.3 + rnd.NextDouble() * 0.1 :
+                                       0.2 + rnd.NextDouble() * 0.1;
+                    prefilledCount = (int)(percentage * cells);
+                    validChoice = true;
+                }
+                else
+                {
+                    Console.WriteLine("You must enter a valid value:");
+                }
+            }
+
+            // Step 3: Fill the grid with pre-filled cells based on difficulty level.
+            FillGrid(grid, prefilledCount, gridSize);
+
+            // Optional: Print the grid for debugging or visualization
+            Console.WriteLine("Generated Sudoku Grid:");
+            PrintGrid(grid, gridSize);
+        }
+
+        // Function to fill the grid with numbers based on difficulty level
+        static void FillGrid(int[,] grid, int prefilledCount, int gridSize)
+        {
+            int filledCells = 0;
+            Random rnd = new Random();
+            while (filledCells < prefilledCount)
+            {
+                int row = rnd.Next(0, gridSize);
+                int col = rnd.Next(0, gridSize);
+
+                // Check if the chosen cell is empty
+                if (grid[row, col] == 0)
+                {
+                    int num = rnd.Next(1, gridSize + 1);
+
+                    // Check if the number can be placed according to Sudoku rules
+                    if (IsValidPlacement(grid, row, col, num, gridSize))
+                    {
+                        grid[row, col] = num;
+                        filledCells++;
+                    }
+                }
+            }
+        }
+
+        // Function to check if placing 'num' in grid[row, col] is valid
+        static bool IsValidPlacement(int[,] grid, int row, int col, int num, int gridSize)
+        {
+            int subGridSize = (int)Math.Sqrt(gridSize);
+
+            // Check the row
+            for (int i = 0; i < gridSize; i++)
+            {
+                if (grid[row, i] == num) return false;
+            }
+
+            // Check the column
+            for (int i = 0; i < gridSize; i++)
+            {
+                if (grid[i, col] == num) return false;
+            }
+
+            // Check the sub-grid
+            int startRow = (row / subGridSize) * subGridSize;
+            int startCol = (col / subGridSize) * subGridSize;
+
+            for (int i = 0; i < subGridSize; i++)
+            {
+                for (int j = 0; j < subGridSize; j++)
+                {
+                    // Ensure we’re not going out of bounds
+                    if ((startRow + i) < gridSize && (startCol + j) < gridSize)
+                    {
+                        if (grid[startRow + i, startCol + j] == num)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // Return true if no conflicts are found
+            return true;
+        }
+
+        // Utility function to print the grid for visualization
+        static void PrintGrid(int[,] grid, int gridSize)
+        {
+            for (int i = 0; i < gridSize; i++)
+            {
+                for (int j = 0; j < gridSize; j++)
+                {
+                    Console.Write(grid[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
