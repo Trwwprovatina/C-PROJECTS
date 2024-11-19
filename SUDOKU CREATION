@@ -7,33 +7,35 @@ namespace Algorithm
         static void Main(string[] args)
         {
             // Step 1: Creation of N x N grid.
-            Console.WriteLine("Let's solve Sudoku!\nType how many cells it will have. The quantity of them must be a perfect square (like 4, 9, 16, etc.):");
             bool isValid = false;
-            int cells = 0;
+            int dimension = 0;
             int gridSize = 0;
+            int cells = 0;
+            Console.WriteLine("Let's create a Sudoku!\nType the dimensions that it will have. The quantity of them must be a perfect square (like 4, 9, 16, etc.):");
 
             while (!isValid)
             {
                 string input = Console.ReadLine();
-                if (int.TryParse(input, out cells))
+                if (int.TryParse(input, out dimension))
                 {
-                    if (cells <= 0)
+                    if (dimension <= 0)
                     {
                         Console.WriteLine("You must give a valid number, not negative or zero.");
                     }
-                    else if ((int)Math.Sqrt(cells) * (int)Math.Sqrt(cells) != cells)
+                    else if ((int)Math.Sqrt(dimension) * (int)Math.Sqrt(dimension) != dimension)
                     {
-                        Console.WriteLine("The number of cells must be a perfect square.");
+                        Console.WriteLine("The number of dimensions must be a perfect square.");
                     }
                     else
                     {
-                        gridSize = (int)Math.Sqrt(cells);
+                        gridSize = dimension;
                         isValid = true;
+                        cells = 2 * (gridSize^2);
                     }
                 }
                 else
                 {
-                    Console.WriteLine("You must enter a valid number:");
+                    Console.WriteLine("You must enter a valid number of dimensions: ");
                 }
             }
 
@@ -112,8 +114,8 @@ namespace Algorithm
             }
 
             // Check the sub-grid
-            int startRow = (row / subGridSize) * subGridSize;
-            int startCol = (col / subGridSize) * subGridSize;
+            int startRow = row;
+            int startCol = col;
 
             for (int i = 0; i < subGridSize; i++)
             {
