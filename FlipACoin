@@ -1,0 +1,96 @@
+using System;
+
+namespace Algorithm
+{
+    class Head_Or_Tails
+    {
+        static int victory = 0;
+        static int loss = 0;
+        static Random rand = new Random();
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine(
+                "We will play a game! The computer will flip a coin, and you will try to guess if it is head or tails!\nHow many times do you want to play?\nYou can play from 1 to 5 times.");
+            int total_games = Total_Games();
+            for (int i = 0; i < total_games; i++)
+            {
+                int flip = Flip_Coin();
+                Guess(flip);
+            }
+
+            Console.WriteLine(FinalResults(victory, loss, total_games));
+        }
+
+        static int Total_Games()
+        {
+            while (true)
+            {
+                string times = Console.ReadLine();
+                if (int.TryParse(times, out int total_games))
+                {
+                    if (total_games >= 1 && total_games <= 5)
+                    {
+                        return total_games;
+                    }
+                    else
+                    {
+                        Console.WriteLine("You can play from 1 to 5 times.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("You must enter a valid number of times.");
+                }
+            }
+        }
+
+        static int Flip_Coin()
+        {
+            Console.WriteLine("The computer just flipped a coin.");
+            return rand.Next(0, 2); // 0 for heads, 1 for tails
+        }
+
+        static void Guess(int flip)
+        {
+            Console.WriteLine("Guess if it was heads or tails. Press 0 for heads, or 1 for tails: ");
+            while (true)
+            {
+                string guess_result = Console.ReadLine();
+                if (int.TryParse(guess_result, out int guess) && (guess == 0 || guess == 1))
+                {
+                    if (guess == flip)
+                    {
+                        Console.WriteLine(Victory_Announcement());
+                        victory++;
+                    }
+                    else
+                    {
+                        Console.WriteLine(Loss_Announcement());
+                        loss++;
+                    }
+                    break; // Exit loop after valid input
+                }
+                else
+                {
+                    Console.WriteLine("You must type 0 or 1.");
+                }
+            }
+        }
+
+        static string Victory_Announcement()
+        {
+            return "You guessed right!";
+        }
+
+        static string Loss_Announcement()
+        {
+            return "You didn't guess right!";
+        }
+
+        static string FinalResults(int wins, int losses, int times)
+        {
+            return $"You won {wins} times, lost {losses} times, and played {times} games in total.";
+        }
+    }
+}
