@@ -1,0 +1,43 @@
+/Περιέχει τις μεθόδους της Console για είσοδο/έξοδο.
+using System;
+//Περιέχει τις μεθόδους για HTTP αιτήσεις.
+using System.Net.Http;
+//Περιέχει τις μεθόδους για ασύγχρονο προγραμματισμό.
+using System.Threading.Tasks;
+
+class Program
+{
+    // Ασύγχρονος προγραμματισμός για αποφυγή καθυστερήσεων στην εκτέλεση του προγράμματος κατά την αναμονή του response.
+    static async Task Main(string[] args)
+    {
+        /*Χρήση του using για αυτόματο κλείσιμο του socket της HTTP αίτησης. 
+        Το HttpClient χρησιμοποιείται για την ανάκτηση δεδομένων (GET) 
+        και την αποστολή δεδομένων (POST) στον διακομιστή. */
+        using (HttpClient client = new HttpClient())
+        {
+            try
+            {
+                // URL που χρησιμοποιείται για δοκιμαστική ανάκτηση δεδομένων από τον server.
+                string url = "https://jsonplaceholder.typicode.com/posts/1";
+                HttpResponseMessage response = await client.GetAsync(url);
+                // Το response.IsSuccessStatusCode είναι true μόνο αν ο κωδικός κατάστασης ανήκει στο εύρος 2xx (επιτυχής απάντηση).
+                if (response.IsSuccessStatusCode)
+                {
+                    // Διαβάζει και εκτυπώνει το περιεχόμενο της απόκρισης σε μορφή string.
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Απόκριση:\n" + responseBody);
+                }
+                //Aλλιώς, αν =1χχ/3χχ/4χχ/5χχ, =false.
+                else
+                {
+                    Console.WriteLine("Σφάλμα: " + response.StatusCode);
+                }
+            }
+            //Σφάλμα κατά την εκτέλεση του αιτήματος HTTP.
+            catch (Exception ex)
+            {
+                Console.WriteLine("Σφάλμα: " + ex.Message);
+            }
+        }
+    }
+}
