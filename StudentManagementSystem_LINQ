@@ -1,0 +1,172 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace StudentManagement
+{
+    // Class to represent a student
+    public class Student
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int YearOfBirth { get; set; }
+        public string Residence { get; set; }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Dictionary to store students with their ID as the key
+            Dictionary<string, Student> students = new Dictionary<string, Student>();
+
+            while (true)
+            {
+                DisplayMenu();
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddStudent(students); // Add a new student
+                        break;
+                    case "2":
+                        DisplayStudents(students); // Display all students
+                        break;
+                    case "3":
+                        DeleteStudent(students); // Delete a student by ID
+                        break;
+                    case "4":
+                        SearchStudent(students); // Search for a student by ID
+                        break;
+                    case "5":
+                        Console.WriteLine("Exiting the program.");
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        // Displays the menu to the user
+        static void DisplayMenu()
+        {
+            Console.WriteLine("\n--- Student Management Menu ---");
+            Console.WriteLine("1. Add a new student");
+            Console.WriteLine("2. Display all students");
+            Console.WriteLine("3. Delete a student");
+            Console.WriteLine("4. Search for a student by ID");
+            Console.WriteLine("5. Exit");
+            Console.Write("Choose an option (1-5): ");
+        }
+
+        // Adds a new student to the dictionary
+        static void AddStudent(Dictionary<string, Student> students)
+        {
+            string id;
+
+            // Validate that the ID is 5 digits long and numeric
+            do
+            {
+                Console.Write("Enter the student's ID (5 digits): ");
+                id = Console.ReadLine();
+
+                // Check for duplicate ID
+                if (students.ContainsKey(id))
+                {
+                    Console.WriteLine("A student with this ID already exists. Please try a different ID.");
+                    id = null; // Reset ID to re-enter
+                }
+            } while (string.IsNullOrEmpty(id) || id.Length != 5 || !id.All(char.IsDigit));
+
+            Console.Write("Enter the student's first name: ");
+            string firstName = Console.ReadLine();
+
+            Console.Write("Enter the student's last name: ");
+            string lastName = Console.ReadLine();
+
+            int yearOfBirth;
+            // Validate that the year of birth is between 1920 and 2010
+            do
+            {
+                Console.Write("Enter the student's year of birth (between 1920 and 2010): ");
+            } while (!int.TryParse(Console.ReadLine(), out yearOfBirth) || yearOfBirth < 1920 || yearOfBirth > 2010);
+
+            Console.Write("Enter the student's residence: ");
+            string residence = Console.ReadLine();
+
+            // Add the student to the dictionary
+            students[id] = new Student
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                YearOfBirth = yearOfBirth,
+                Residence = residence
+            };
+
+            Console.WriteLine("Student added successfully!");
+        }
+
+        // Displays all students in the dictionary
+        static void DisplayStudents(Dictionary<string, Student> students)
+        {
+            // Check if the dictionary is empty
+            if (!students.Any()) // LINQ: Checks if the dictionary has any elements
+            {
+                Console.WriteLine("No students are registered.");
+            }
+            else
+            {
+                // LINQ: Orders the students by their ID
+                foreach (var student in students.OrderBy(s => s.Key))
+                {
+                    Console.WriteLine($"ID: {student.Key}, Name: {student.Value.FirstName} {student.Value.LastName}, " +
+                                      $"Year of Birth: {student.Value.YearOfBirth}, Residence: {student.Value.Residence}");
+                }
+            }
+        }
+
+        // Deletes a student from the dictionary by their ID
+        static void DeleteStudent(Dictionary<string, Student> students)
+        {
+            Console.Write("Enter the ID of the student to delete: ");
+            string id = Console.ReadLine();
+
+            // Remove the student if the ID exists
+            if (students.Remove(id))
+            {
+                Console.WriteLine("Student removed successfully.");
+            }
+            else
+            {
+                Console.WriteLine("No student found with the given ID.");
+            }
+        }
+
+        // Searches for a student by their ID
+        static void SearchStudent(Dictionary<string, Student> students)
+        {
+            string id;
+            // Loop until the user decides to exit the search
+            do
+            {
+                Console.Write("Enter the ID of the student to search (or press Enter to return to the menu): ");
+                id = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(id)) break;
+
+                // Try to find the student by their ID
+                if (students.TryGetValue(id, out Student student))
+                {
+                    Console.WriteLine($"ID: {id}, Name: {student.FirstName} {student.LastName}, " +
+                                      $"Year of Birth: {student.YearOfBirth}, Residence: {student.Residence}");
+                }
+                else
+                {
+                    Console.WriteLine("No student found with the given ID.");
+                }
+            } while (!string.IsNullOrEmpty(id));
+        }
+    }
+}
