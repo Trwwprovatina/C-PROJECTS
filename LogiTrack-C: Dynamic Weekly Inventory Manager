@@ -1,0 +1,167 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define DAYS_IN_WEEK 7
+
+char day[DAYS_IN_WEEK][10] = {"Δευτ.", "Τρίτη", "Τέτ.", "Πεμπ.", "Παρ.", "Σάβ.", "Κυρ."};
+
+struct masters_per_day {
+    char master[50];
+    int quantity[DAYS_IN_WEEK];
+    int cost_of_insurance;
+};
+
+// Συνάρτηση για λήψη αριθμού προϊόντων
+int get_number_of_products() {
+    int n;
+    printf("Γράψε πόσα διαφορετικά προιόντα υπάρχουν: ");
+    scanf("%d", &n);
+    while (n < 0) {
+        printf("Δεν γίνεται να έχεις αρνητικό αριθμό: ");
+        scanf("%d", &n);
+    }
+    return n;
+}
+
+// Εισαγωγή ποσοτήτων ανά ημέρα
+void input_quantities(struct masters_per_day *s1, int n) {
+    printf("Εισάγετε τις εισερχόμενες ποσότητες για κάθε προιόν για 7 ημέρες (θετικούς ακέραιους):\n");
+    for (int i = 0; i < n; i++) {
+        printf("Προιόν #%d:\n", i + 1);
+        for (int j = 0; j < DAYS_IN_WEEK; j++) {
+            int qty;
+            printf("Ημέρα %d: ", j + 1);
+            scanf("%d", &qty);
+            while (qty < 0) {
+                printf("Δεν μπορείς να έχεις αρνητική ποσότητα παραλαβής: ");
+                scanf("%d", &qty);
+            }
+            s1[i].quantity[j] = qty;
+        }
+    }
+}
+
+// Εκτύπωση πίνακα αποθεμάτων
+void print_stock_table(struct masters_per_day *s1, int n) {
+    printf("Πίνακας αποθεμάτων: \n");
+    printf("Προιόν\t\t");
+    for (int i = 0; i < DAYS_IN_WEEK; i++) {
+        printf("%s\t", day[i]);
+    }
+    for (int j = 0; j < n; j++) {
+        printf("\nΠροιόν #%d\t", j + 1);
+        for (int d = 0; d < DAYS_IN_WEEK; d++) {
+            printf("%d\t", s1[j].quantity[d]);
+        }
+    }
+    printf("\n");
+}
+
+// Συνολικά αποθέματα εβδομάδας
+void print_weekly_totals(struct masters_per_day *s1, int n) {
+    printf("\nΣυνολικό απόθεμα εβδομάδας για κάθε προιόν: \n");
+    for (int i = 0; i < n; i++) {
+        int sum = 0;
+        for (int j = 0; j < DAYS_IN_WEEK; j++) {
+            sum += s1[i].quantity[j];
+        }
+        printf("Προιόν #%d: %d\n", i + 1, sum);
+    }
+}
+
+// Εύρεση ημέρας και προϊόντος με μέγιστο απόθεμα
+void print_max_stock_day(struct masters_per_day *s1, int n) {
+    printf("\nΥψηλότερο επίπεδο αποθέματος: \n");
+    int max = s1[0].quantity[0];
+    int master = 0, day_index = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < DAYS_IN_WEEK; j++) {
+            if (s1[i].quantity[j] > max) {
+                max = s1[i].quantity[j];
+                master = i;
+                day_index = j;
+            }
+        }
+    }
+    printf("Προιόν #%d την ημέρα %d με ποσότητα %d\n", master + 1, day_index + 1, max);
+}
+
+// Μέσος όρος αποθέματος
+void print_average_stock(struct masters_per_day *s1, int n) {
+    printf("\nΜέσος όρος αποθέματος για κάθε προιόν:\n");
+    for (int i = 0; i < n; i++) {
+        int sum = 0;
+        for (int j = 0; j < DAYS_IN_WEEK; j++) {
+            sum += s1[i].quantity[j];
+        }
+        double average = (double)sum / DAYS_IN_WEEK;
+        printf("Προιόν #%d: %.2lf\n", i + 1, average);
+    }
+}
+
+// Εισαγωγή κόστους ασφάλισης και υπολογισμός συνολικού κόστους
+void input_insurance_costs(struct masters_per_day *s1, int n) {
+    for (int i = 0; i < n; i++) {
+        int cost;
+        printf("\nΓράψε το κόστος ασφάλισης του προιόντος %d: ", i + 1);
+        scanf("%d", &cost);
+        while (cost < 0) {
+            printf("Δεν γίνεται να είναι αρνητικό το κόστος ασφάλισης: ");
+            scanf("%d", &cost);
+        }
+        s1[i].cost_of_insurance = cost;
+
+        int total_quantity = 0;
+        for (int j = 0; j < DAYS_IN_WEEK; j++) {
+            total_quantity += s1[i].quantity[j];
+        }
+
+        int total_cost = total_quantity * cost;
+        printf("Συνολικό κόστος ασφάλισης για το Προιόν %d: %d$\n", i + 1, total_cost);
+    }
+}
+
+// Εύρεση προϊόντος με τη χαμηλότερη ασφάλιση
+void find_min_insurance_product(struct masters_per_day *s1, int n) {
+    int min = s1[0].cost_of_insurance;
+    int min_index = 0;
+
+    for (int i = 1; i < n; i++) {
+        if (s1[i].cost_of_insurance < min) {
+            min = s1[i].cost_of_insurance;
+            min_index = i;
+        }
+    }
+
+    printf("\nΠροιόν με τη χαμηλότερη ασφάλιση: Προιόν #%d\n", min_index + 1);
+}
+
+// Κεντρική συνάρτηση
+int number_of_different_master() {
+    int n = get_number_of_products();
+
+    // Δυναμική δέσμευση μνήμης
+    struct masters_per_day *s1 = (struct masters_per_day *)malloc(n * sizeof(struct masters_per_day));
+    if (s1 == NULL) {
+        printf("Σφάλμα: αποτυχία δέσμευσης μνήμης.\n");
+        return 1;
+    }
+
+    input_quantities(s1, n);
+    print_stock_table(s1, n);
+    print_weekly_totals(s1, n);
+    print_max_stock_day(s1, n);
+    print_average_stock(s1, n);
+    input_insurance_costs(s1, n);
+    find_min_insurance_product(s1, n);
+
+    free(s1); // αποδέσμευση μνήμης
+    return n;
+}
+
+int main() {
+    int number_of_different_masters = number_of_different_master();
+    return 0;
+}
