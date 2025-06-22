@@ -1,0 +1,13 @@
+    struct Node* current = *head;
+    struct Node* prev = NULL;
+    struct Node* next = NULL;
+
+    while (current != NULL) {
+        next = current->next;   // Αποθήκευση του επόμενου κόμβου
+        current->next = prev;   // Αντιστροφή της σύνδεσης
+        prev = current;         // Μετακίνηση prev στον τρέχοντα κόμβο
+        current = next;         // Προχωράμε στον επόμενο κόμβο
+    }
+
+    *head = prev;  // Ενημέρωση της κεφαλής με τον νέο πρώτο κόμβο
+}
